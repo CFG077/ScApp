@@ -8,7 +8,15 @@
     textarea, pre { width: 100%; font-size: 16px; }
     textarea { height: 150px; }
     button { margin-top: 10px; padding: 10px; font-size: 16px; }
-    #output { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; }
+    #output { 
+      background: #f4f4f4; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 5px; 
+      white-space: pre-wrap; 
+      max-height: 400px; 
+      overflow-y: auto; 
+    }
   </style>
 </head>
 <body>
@@ -29,12 +37,17 @@
       // Split groups by blank lines (2+ newlines)
       const groups = input.split(/\n\s*\n/);
 
-      const result = groups.map(group => {
+      const result = groups.map((group, index) => {
         const lines = group.split(/\n/);
         const codes = lines
           .map(line => line.replace(/\s+/g, "").trim())
           .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
-        return "['" + codes.join("', '") + "']";
+
+        if (codes.length === 0) return "";
+
+        // Format each group nicely with line breaks
+        const formattedCodes = "['" + codes.join("',\n '") + "']";
+        return `Group ${index + 1}:\n${formattedCodes}\n`;
       });
 
       document.getElementById("output").textContent = result.join("\n");
