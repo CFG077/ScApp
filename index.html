@@ -8,24 +8,49 @@
     textarea, pre { width: 100%; font-size: 16px; }
     textarea { height: 150px; }
     button { margin-top: 10px; padding: 10px; font-size: 16px; }
+    #output { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; border-radius: 5px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
   <h2>Recovery Code Cleaner</h2>
+
   <textarea id="input" placeholder="Paste your recovery codes here..."></textarea>
   <br>
   <button onclick="cleanCodes()">Clean Codes</button>
+  <button onclick="copyOutput()">Copy Output</button>
+
   <h3>Output:</h3>
   <pre id="output"></pre>
 
   <script>
     function cleanCodes() {
-      const input = document.getElementById("input").value;
-      const lines = input.split(/\n/);
-      const codes = lines
-        .map(line => line.replace(/\s+/g, "").trim())
-        .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
-      document.getElementById("output").textContent = JSON.stringify(codes, null, 2);
+      const input = document.getElementById("input").value.trim();
+
+      // Split groups by blank lines (2+ newlines)
+      const groups = input.split(/\n\s*\n/);
+
+      const result = groups.map(group => {
+        const lines = group.split(/\n/);
+        const codes = lines
+          .map(line => line.replace(/\s+/g, "").trim())
+          .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
+        return "['" + codes.join("', '") + "']";
+      });
+
+      document.getElementById("output").textContent = result.join("\n");
+    }
+
+    function copyOutput() {
+      const output = document.getElementById("output").textContent;
+      if (!output) {
+        alert("No output to copy!");
+        return;
+      }
+      navigator.clipboard.writeText(output).then(() => {
+        alert("Output copied to clipboard!");
+      }).catch(err => {
+        alert("Failed to copy: " + err);
+      });
     }
   </script>
 </body>
