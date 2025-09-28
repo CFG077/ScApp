@@ -34,22 +34,23 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split groups by "Supercell ID Recovery Codes:"
-      const groups = input.split(/Supercell ID Recovery Codes:/).filter(g => g.trim() !== "");
+      // Split groups by "Supercell ID Recovery Codes:" and filter out empty groups
+      const groups = input.split(/Supercell ID Recovery Codes:/).map(g => g.trim()).filter(g => g.length > 0);
 
       const result = groups.map(group => {
-        const lines = group.split(/\n/);
-        const codes = lines
-          .map(line => line.replace(/\s+/g, "").trim()) // Remove all spaces
-          .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
+        // Split lines and clean codes
+        const codes = group.split(/\n/)
+          .map(line => line.replace(/\s+/g, '').trim()) // remove all spaces
+          .filter(line => line.length > 0); // ignore empty lines
 
-        if (codes.length === 0) return "";
+        if (codes.length === 0) return ""; // skip empty groups
 
         // Format as one-line array per group
-        return "['" + codes.join("','") + "']\n"; // Add a blank line after each array
-      });
+        return "['" + codes.join("','") + "']";
+      }).filter(line => line.length > 0); // remove any empty strings
 
-      document.getElementById("output").textContent = result.join("\n"); // double newline between groups
+      // Add a blank line between groups for readability
+      document.getElementById("output").textContent = result.join("\n\n");
     }
 
     function copyOutput() {
