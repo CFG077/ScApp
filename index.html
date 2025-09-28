@@ -35,13 +35,16 @@
       const input = document.getElementById("input").value.trim();
 
       // Split groups by "Supercell ID Recovery Codes:" and filter out empty groups
-      const groups = input.split(/Supercell ID Recovery Codes:/).map(g => g.trim()).filter(g => g.length > 0);
+      const groups = input.split(/Supercell ID Recovery Codes:/)
+        .map(g => g.trim().replace(/^"+|"+$/g, "")) // remove leading/trailing quotes
+        .filter(g => g.length > 0);
 
       const result = groups.map(group => {
         // Split lines and clean codes
         const codes = group.split(/\n/)
           .map(line => line.replace(/\s+/g, '').trim()) // remove all spaces
-          .filter(line => line.length > 0); // ignore empty lines
+          .map(line => line.replace(/^"+|"+$/g, ""))    // remove quotes from lines
+          .filter(line => line.length > 0);             // ignore empty lines
 
         if (codes.length === 0) return ""; // skip empty groups
 
