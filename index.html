@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recovery Code Cleaner</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    textarea, pre { width: 100%; font-size: 16px; }
+    textarea { height: 150px; }
+    button { margin-top: 10px; padding: 10px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>Recovery Code Cleaner</h2>
+  <textarea id="input" placeholder="Paste your recovery codes here..."></textarea>
+  <br>
+  <button onclick="cleanCodes()">Clean Codes</button>
+  <h3>Output:</h3>
+  <pre id="output"></pre>
+
+  <script>
+    function cleanCodes() {
+      const input = document.getElementById("input").value;
+      const lines = input.split(/\n/);
+      const codes = lines
+        .map(line => line.replace(/\s+/g, "").trim())
+        .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
+      document.getElementById("output").textContent = JSON.stringify(codes, null, 2);
+    }
+  </script>
+</body>
+</html>
