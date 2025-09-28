@@ -34,23 +34,22 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split groups by blank lines (2+ newlines)
-      const groups = input.split(/\n\s*\n/);
+      // Split groups by "Supercell ID Recovery Codes:"
+      const groups = input.split(/Supercell ID Recovery Codes:/).filter(g => g.trim() !== "");
 
-      const result = groups.map((group, index) => {
+      const result = groups.map(group => {
         const lines = group.split(/\n/);
         const codes = lines
-          .map(line => line.replace(/\s+/g, "").trim())
+          .map(line => line.replace(/\s+/g, "").trim()) // Remove all spaces
           .filter(line => line.length > 0 && !line.toLowerCase().includes("supercell"));
 
         if (codes.length === 0) return "";
 
-        // Format each group nicely with line breaks
-        const formattedCodes = "['" + codes.join("',\n '") + "']";
-        return `Group ${index + 1}:\n${formattedCodes}\n`;
+        // Format as one-line array per group
+        return "['" + codes.join("','") + "']\n"; // Add a blank line after each array
       });
 
-      document.getElementById("output").textContent = result.join("\n");
+      document.getElementById("output").textContent = result.join("\n"); // double newline between groups
     }
 
     function copyOutput() {
