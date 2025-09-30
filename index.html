@@ -34,25 +34,25 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split groups by "Supercell ID Recovery Codes:" and filter out empty groups
-      const groups = input.split(/Supercell ID Recovery Codes:/)
-        .map(g => g.trim().replace(/^"+|"+$/g, "")) // remove leading/trailing quotes
+      // Split groups by "Supercell ID Recovery Codes:" and filter out empty ones
+      const groups = input.split(/Supercell ID Recovery Codes:/i)
+        .map(g => g.trim().replace(/^"+|"+$/g, "")) // remove surrounding quotes
         .filter(g => g.length > 0);
 
       const result = groups.map(group => {
-        // Split lines and clean codes
-        const codes = group.split(/\n/)
-          .map(line => line.replace(/\s+/g, '').trim()) // remove all spaces
-          .map(line => line.replace(/^"+|"+$/g, ""))    // remove quotes from lines
-          .filter(line => line.length > 0);             // ignore empty lines
+        // Remove all whitespace and newlines
+        let cleaned = group.replace(/\s+/g, '').trim();
 
-        if (codes.length === 0) return ""; // skip empty groups
+        // Auto-detect codes: split into chunks of 12 characters
+        const codes = cleaned.match(/.{12}/g) || [];
 
-        // ✅ strict one-line format, no spaces after commas
+        if (codes.length === 0) return "";
+
+        // Format as one-line array with no spaces
         return "['" + codes.join("','") + "']";
-      }).filter(line => line.length > 0); // remove any empty strings
+      }).filter(line => line.length > 0);
 
-      // Add a blank line between groups for readability
+      // Add blank line between groups
       document.getElementById("output").textContent = result.join("\n\n");
     }
 
