@@ -48,7 +48,7 @@
 
         if (codes.length === 0) return ""; // skip empty groups
 
-        // Format as one-line array per group
+        // ✅ strict one-line format, no spaces after commas
         return "['" + codes.join("','") + "']";
       }).filter(line => line.length > 0); // remove any empty strings
 
