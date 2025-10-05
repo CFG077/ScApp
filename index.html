@@ -5,7 +5,7 @@
   <title>Recovery Code Cleaner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
+    body { font-family: Arial; padding: 20px; }
     textarea, pre { width: 100%; font-size: 16px; }
     textarea { height: 150px; }
     button { margin-top: 10px; padding: 10px; font-size: 16px; cursor: pointer; }
@@ -22,21 +22,24 @@
   </style>
 </head>
 <body>
-  <h2>Recovery Code Cleaner (12-character codes)</h2>
+  <h2>Recovery Code Cleaner</h2>
 
   <textarea id="input" placeholder="Paste your recovery codes here..."></textarea>
   <br>
-  <button onclick="cleanCodes()">Clean Codes</button>
-  <button onclick="copyOutput()">Copy Output</button>
+  <button id="cleanBtn">Clean Codes</button>
+  <button id="copyBtn">Copy Output</button>
 
   <h3>Output:</h3>
   <pre id="output"></pre>
 
   <script>
-    function cleanCodes() {
+    const cleanBtn = document.getElementById('cleanBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    cleanBtn.addEventListener('click', () => {
       const input = document.getElementById("input").value;
 
-      // Remove all non-alphanumeric characters (spaces, commas, brackets, quotes, newlines)
+      // Keep only letters and numbers
       const cleanedInput = input.replace(/[^A-Za-z0-9]/g, '');
 
       const CODE_LENGTH = 12;
@@ -49,32 +52,28 @@
 
         for (let j = 0; j < groupStr.length; j += CODE_LENGTH) {
           const code = groupStr.slice(j, j + CODE_LENGTH);
-          if (code.length === CODE_LENGTH) {
-            group.push(code);
-          }
+          if (code.length === CODE_LENGTH) group.push(code);
         }
 
-        // Only include groups with exactly 3 codes
         if (group.length === CODES_PER_GROUP) {
-          result.push(`['${group.join("', '")}']`);
+          // Join codes without spaces after commas
+          result.push(`['${group.join("','")}']`);
         }
       }
 
       document.getElementById("output").textContent = result.join("\n\n");
-    }
+    });
 
-    function copyOutput() {
+    copyBtn.addEventListener('click', () => {
       const output = document.getElementById("output").textContent;
-      if (!output) {
-        alert("No output to copy!");
-        return;
-      }
-      navigator.clipboard.writeText(output).then(() => {
+      if (!output) { alert("No output to copy!"); return; }
+      try {
+        navigator.clipboard.writeText(output);
         alert("Output copied to clipboard!");
-      }).catch(err => {
-        alert("Failed to copy: " + err);
-      });
-    }
+      } catch(e) {
+        alert("Clipboard copy failed.");
+      }
+    });
   </script>
 </body>
 </html>
