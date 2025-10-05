@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recovery Code Cleaner</title>
+  <title>Recovery Code Cleaner (12-character codes)</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     textarea, pre { width: 100%; font-size: 16px; }
@@ -35,19 +35,19 @@
     function cleanCodes() {
       const input = document.getElementById("input").value;
 
-      // Remove all spaces, commas, newlines, and other separators
-      const cleanedInput = input.replace(/[\s,]+/g, '');
+      // Remove all non-alphanumeric characters (spaces, commas, brackets, quotes, newlines)
+      const cleanedInput = input.replace(/[^A-Za-z0-9]/g, '');
 
       const CODE_LENGTH = 12;
       const CODES_PER_GROUP = 3;
       const result = [];
 
-      // Loop through the cleaned input and extract codes
+      // Process the cleaned string in groups of 36 characters (3 codes per group)
       for (let i = 0; i < cleanedInput.length; i += CODE_LENGTH * CODES_PER_GROUP) {
         const groupStr = cleanedInput.slice(i, i + CODE_LENGTH * CODES_PER_GROUP);
         const group = [];
 
-        // Extract each code in this group
+        // Extract each 12-character code
         for (let j = 0; j < groupStr.length; j += CODE_LENGTH) {
           const code = groupStr.slice(j, j + CODE_LENGTH);
           if (code.length === CODE_LENGTH) {
@@ -55,7 +55,7 @@
           }
         }
 
-        // Only add groups that have exactly 3 codes
+        // Only include groups that have exactly 3 codes
         if (group.length === CODES_PER_GROUP) {
           result.push(`['${group.join("', '")}']`);
         }
@@ -70,12 +70,4 @@
         alert("No output to copy!");
         return;
       }
-      navigator.clipboard.writeText(output).then(() => {
-        alert("Output copied to clipboard!");
-      }).catch(err => {
-        alert("Failed to copy: " + err);
-      });
-    }
-  </script>
-</body>
-</html>
+      navigator.clipboard.writeText(output).then
