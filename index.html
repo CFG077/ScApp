@@ -13,9 +13,11 @@
       padding: 10px; 
       border: 1px solid #ccc; 
       border-radius: 5px; 
-      white-space: pre-wrap; 
-      max-height: 400px; 
-      overflow-y: auto; 
+      white-space: nowrap; /* ⬅️ never wrap text */
+      overflow-x: auto;    /* ⬅️ allows horizontal scroll */
+      overflow-y: auto;
+      max-height: 400px;
+      font-family: monospace;
     }
   </style>
 </head>
@@ -34,25 +36,24 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split by each "Supercell ID Recovery Codes:" block
-      const groups = input.split(/Supercell ID Recovery Codes:/i)
-        .map(g => g.trim().replace(/^['"\[\]]+|['"\[\]]+$/g, "")) // remove [] and quotes
+      // Split by groups starting with "Supercell ID Recovery Codes" or new lines
+      const groups = input
+        .split(/(?:Supercell ID Recovery Codes:|\n\s*\n)+/i)
+        .map(g => g.trim())
         .filter(g => g.length > 0);
 
       const result = groups.map(group => {
-        // Remove all whitespace
-        const cleaned = group.replace(/\s+/g, '').trim();
+        // Split by comma or newline
+        const codes = group.split(/,|\n/).map(c => c.trim()).filter(c => c.length > 0);
 
-        // Split into 12-character recovery codes
-        const codes = cleaned.match(/.{12}/g) || [];
+        // Remove spaces inside each code
+        const cleaned = codes.map(c => c.replace(/\s+/g, ''));
 
-        if (codes.length === 0) return "";
-
-        // Add a single space after each comma
-        return `['${codes.join(', ')}']`;
+        // Join with comma and single space
+        return `['${cleaned.join("', '")}']`;
       });
 
-      // Show each group separated by one blank line
+      // Join each group on a new line
       document.getElementById("output").textContent = result.join("\n\n");
     }
 
