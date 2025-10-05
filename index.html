@@ -34,30 +34,25 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split groups by either "Supercell ID Recovery Codes:" or newlines
-      const groups = input.split(/Supercell ID Recovery Codes:|\n/gi)
+      // Split by each "Supercell ID Recovery Codes:" block
+      const groups = input.split(/Supercell ID Recovery Codes:/i)
         .map(g => g.trim().replace(/^['"\[\]]+|['"\[\]]+$/g, "")) // remove [] and quotes
         .filter(g => g.length > 0);
 
       const result = groups.map(group => {
-        let codes = [];
+        // Remove all whitespace
+        const cleaned = group.replace(/\s+/g, '').trim();
 
-        if (group.includes(",")) {
-          // Case: already comma-separated codes
-          codes = group.split(",").map(c => c.replace(/\s+/g, "").trim());
-        } else {
-          // Case: raw codes — remove spaces and split every 12 characters
-          let cleaned = group.replace(/\s+/g, "").trim();
-          codes = cleaned.match(/.{12}/g) || [];
-        }
+        // Split into 12-character recovery codes
+        const codes = cleaned.match(/.{12}/g) || [];
 
         if (codes.length === 0) return "";
 
-        // Always format cleanly: ['A','B','C']
-        return "['" + codes.join("','") + "']";
+        // Add a single space after each comma
+        return `['${codes.join(', ')}']`;
       });
 
-      // Add blank line between groups
+      // Show each group separated by one blank line
       document.getElementById("output").textContent = result.join("\n\n");
     }
 
