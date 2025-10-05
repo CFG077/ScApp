@@ -21,7 +21,7 @@
   </style>
 </head>
 <body>
-  <h2>Recovery Code Cleaner</h2>
+  <h2>Recovery Code Cleaner (12-character codes)</h2>
 
   <textarea id="input" placeholder="Paste your recovery codes here..."></textarea>
   <br>
@@ -33,37 +33,33 @@
 
   <script>
     function cleanCodes() {
-      const input = document.getElementById("input").value.trim();
+      const input = document.getElementById("input").value;
 
-      // Split by lines first
-      const lines = input.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
+      // Remove all spaces, commas, newlines, and other separators
+      const cleanedInput = input.replace(/[\s,]+/g, '');
 
+      const CODE_LENGTH = 12;
+      const CODES_PER_GROUP = 3;
       const result = [];
 
-      lines.forEach(line => {
-        if (/^\s*\[.*\]\s*$/.test(line)) {
-          // Already array format
-          const inner = line.replace(/^\[|\]$/g, '')
-                            .split(',')
-                            .map(c => c.trim().replace(/^['"]|['"]$/g, ''))
-                            .filter(c => c.length > 0);
-          // Split into groups of 3 codes
-          for (let i = 0; i < inner.length; i += 3) {
-            const group = inner.slice(i, i + 3);
-            result.push(`['${group.join("', '")}']`);
-          }
-        } else {
-          // Raw codes
-          const codes = line.split(/,|\s+/).map(c => c.trim()).filter(c => c.length > 0);
-          // Remove spaces inside each code
-          const cleaned = codes.map(c => c.replace(/\s+/g, ''));
-          // Split into groups of 3 codes
-          for (let i = 0; i < cleaned.length; i += 3) {
-            const group = cleaned.slice(i, i + 3);
-            result.push(`['${group.join("', '")}']`);
+      // Loop through the cleaned input and extract codes
+      for (let i = 0; i < cleanedInput.length; i += CODE_LENGTH * CODES_PER_GROUP) {
+        const groupStr = cleanedInput.slice(i, i + CODE_LENGTH * CODES_PER_GROUP);
+        const group = [];
+
+        // Extract each code in this group
+        for (let j = 0; j < groupStr.length; j += CODE_LENGTH) {
+          const code = groupStr.slice(j, j + CODE_LENGTH);
+          if (code.length === CODE_LENGTH) {
+            group.push(code);
           }
         }
-      });
+
+        // Only add groups that have exactly 3 codes
+        if (group.length === CODES_PER_GROUP) {
+          result.push(`['${group.join("', '")}']`);
+        }
+      }
 
       document.getElementById("output").textContent = result.join("\n\n");
     }
