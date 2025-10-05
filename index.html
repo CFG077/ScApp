@@ -35,30 +35,36 @@
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split input into groups using header or double newlines
-      const groups = input
-        .split(/(?:Supercell ID Recovery Codes:|\n\s*\n)+/i)
-        .map(g => g.trim())
-        .filter(g => g.length > 0);
+      // Split by lines first
+      const lines = input.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
 
-      const result = groups.map(group => {
-        // Check if the group is already an array string
-        if (/^\s*\[.*\]\s*$/.test(group)) {
-          // Remove brackets, split by comma, remove quotes and spaces
-          const inner = group.replace(/^\[|\]$/g, '')
-                             .split(',')
-                             .map(c => c.trim().replace(/^['"]|['"]$/g, ''))
-                             .filter(c => c.length > 0);
-          return `['${inner.join("', '")}']`;
+      const result = [];
+
+      lines.forEach(line => {
+        if (/^\s*\[.*\]\s*$/.test(line)) {
+          // Already array format
+          const inner = line.replace(/^\[|\]$/g, '')
+                            .split(',')
+                            .map(c => c.trim().replace(/^['"]|['"]$/g, ''))
+                            .filter(c => c.length > 0);
+          // Split into groups of 3 codes
+          for (let i = 0; i < inner.length; i += 3) {
+            const group = inner.slice(i, i + 3);
+            result.push(`['${group.join("', '")}']`);
+          }
         } else {
-          // Normal raw codes
-          const codes = group.split(/,|\n/).map(c => c.trim()).filter(c => c.length > 0);
+          // Raw codes
+          const codes = line.split(/,|\s+/).map(c => c.trim()).filter(c => c.length > 0);
+          // Remove spaces inside each code
           const cleaned = codes.map(c => c.replace(/\s+/g, ''));
-          return `['${cleaned.join("', '")}']`;
+          // Split into groups of 3 codes
+          for (let i = 0; i < cleaned.length; i += 3) {
+            const group = cleaned.slice(i, i + 3);
+            result.push(`['${group.join("', '")}']`);
+          }
         }
       });
 
-      // Output each group on its own line with a blank line between groups
       document.getElementById("output").textContent = result.join("\n\n");
     }
 
