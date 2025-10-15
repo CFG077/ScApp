@@ -57,43 +57,35 @@
 
   <script>
     function cleanCodes() {
-      const input = document.getElementById("input").value.trim();
+      const input = document.getElementById("input").value;
 
-      if (!input) {
+      if (!input.trim()) {
         document.getElementById("output").textContent = "Please paste some codes first!";
         return;
       }
 
-      // Remove all quotes and unnecessary labels
-      let text = input
-        .replace(/["']/g, '')
-        .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, '')
-        .trim();
+      // Remove quotes and text like "Supercell ID Recovery Codes:"
+      let cleaned = input
+        .replace(/["']/g, "")
+        .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, "")
+        .replace(/\s+/g, "") // remove all whitespace
+        .toUpperCase();
 
-      // Split into groups by double newlines or clear separations
-      const groups = text.split(/\n\s*\n/).filter(g => g.trim().length > 0);
+      // Split every 12 characters into one code
+      const codes = cleaned.match(/.{1,12}/g) || [];
 
-      const result = groups.map(group => {
-        const codes = group
-          .split(/,|\n| /)
-          .map(c => c.trim())
-          .filter(c => c.length > 0)
-          .map(c => c.replace(/\s+/g, ''));
+      // Filter out any weird short fragments
+      const validCodes = codes.filter(c => c.length === 12);
 
-        // Skip invalid or empty code groups
-        if (codes.length === 0) return null;
+      // Format output: ['CODE1','CODE2','CODE3']
+      const formatted = `['${validCodes.join("','")}']`;
 
-        // ✅ Join with no space after commas
-        return `['${codes.join("','")}']`;
-      }).filter(Boolean);
-
-      // Show final result
-      document.getElementById("output").textContent = result.join("\n\n");
+      document.getElementById("output").textContent = formatted;
     }
 
     function copyOutput() {
       const output = document.getElementById("output").textContent;
-      if (!output) {
+      if (!output.trim()) {
         alert("No output to copy!");
         return;
       }
