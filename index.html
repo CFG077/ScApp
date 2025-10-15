@@ -64,32 +64,30 @@
         return;
       }
 
-      // Split input into separate groups
-      const groups = input
-        .split(/Supercell ID Recovery Codes:|(?=\n\n)|(?=\r\n\r\n)/gi)
-        .map(g => g.trim())
-        .filter(g => g.length > 0);
+      // Remove all quotes and unnecessary labels
+      let text = input
+        .replace(/["']/g, '')
+        .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, '')
+        .trim();
+
+      // Split into groups by double newlines or clear separations
+      const groups = text.split(/\n\s*\n/).filter(g => g.trim().length > 0);
 
       const result = groups.map(group => {
-        // Remove any unwanted text or quotes
-        let cleanedGroup = group
-          .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, '')
-          .replace(/"/g, '')
-          .trim();
-
-        // Split by commas, newlines, or multiple spaces
-        const codes = cleanedGroup
-          .split(/,|\n|\r|\s{2,}/)
+        const codes = group
+          .split(/,|\n| /)
           .map(c => c.trim())
-          .filter(c => c.length > 0);
+          .filter(c => c.length > 0)
+          .map(c => c.replace(/\s+/g, ''));
 
-        // Remove all spaces inside each code
-        const cleaned = codes.map(c => c.replace(/\s+/g, ''));
+        // Skip invalid or empty code groups
+        if (codes.length === 0) return null;
 
-        // ✅ Join without any spaces after commas
-        return `['${cleaned.join("','")}']`;
-      });
+        // ✅ Join with no space after commas
+        return `['${codes.join("','")}']`;
+      }).filter(Boolean);
 
+      // Show final result
       document.getElementById("output").textContent = result.join("\n\n");
     }
 
