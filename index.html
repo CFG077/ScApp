@@ -14,7 +14,7 @@
       font-size: 16px; 
     }
     textarea { 
-      height: 150px; 
+      height: 180px; 
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -57,30 +57,33 @@
 
   <script>
     function cleanCodes() {
-      const input = document.getElementById("input").value;
-
-      if (!input.trim()) {
+      const input = document.getElementById("input").value.trim();
+      if (!input) {
         document.getElementById("output").textContent = "Please paste some codes first!";
         return;
       }
 
-      // Remove quotes and text like "Supercell ID Recovery Codes:"
-      let cleaned = input
-        .replace(/["']/g, "")
-        .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, "")
-        .replace(/\s+/g, "") // remove all whitespace
-        .toUpperCase();
+      // Split by each "Supercell ID Recovery Codes:" section
+      const groups = input.split(/Supercell\s*ID\s*Recovery\s*Codes[:]?/gi).filter(Boolean);
+      let finalOutput = "";
 
-      // Split every 12 characters into one code
-      const codes = cleaned.match(/.{1,12}/g) || [];
+      for (let group of groups) {
+        // Remove quotes and spaces
+        let cleaned = group
+          .replace(/["']/g, "")
+          .replace(/\s+/g, "")
+          .toUpperCase();
 
-      // Filter out any weird short fragments
-      const validCodes = codes.filter(c => c.length === 12);
+        // Split every 12 characters
+        const codes = cleaned.match(/.{1,12}/g) || [];
+        const validCodes = codes.filter(c => c.length === 12);
 
-      // Format output: ['CODE1','CODE2','CODE3']
-      const formatted = `['${validCodes.join("','")}']`;
+        if (validCodes.length) {
+          finalOutput += `['${validCodes.join("','")}']\n\n`;
+        }
+      }
 
-      document.getElementById("output").textContent = formatted;
+      document.getElementById("output").textContent = finalOutput.trim();
     }
 
     function copyOutput() {
