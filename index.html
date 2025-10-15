@@ -1,123 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supercell ID Recovery Code Cleaner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recovery Code Cleaner</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 40px;
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px; 
+      background: #fafafa;
     }
-
-    .container {
-      background: #fff;
-      padding: 25px 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 500px;
-      max-width: 90%;
+    textarea, pre { 
+      width: 100%; 
+      font-size: 16px; 
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 20px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 180px;
+    textarea { 
+      height: 150px; 
       padding: 10px;
-      font-size: 15px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      resize: none;
-      outline: none;
     }
-
-    button {
-      margin-top: 12px;
-      padding: 10px 18px;
+    button { 
+      margin-top: 10px; 
+      padding: 10px 15px; 
+      font-size: 16px; 
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 15px;
-      background: #007bff;
-      color: #fff;
-      transition: 0.2s;
+      background-color: #007bff;
+      color: white;
     }
-
     button:hover {
-      background: #0056b3;
+      background-color: #0056b3;
     }
-
-    #output {
-      background: #f0f0f0;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-      white-space: pre-wrap;
-      font-family: monospace;
+    #output { 
+      background: #f4f4f4; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 5px; 
+      white-space: pre-wrap; 
+      max-height: 400px; 
+      overflow-y: auto; 
+      margin-top: 10px;
     }
-
-    .buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Supercell ID Recovery Code Cleaner</h1>
+  <h2>Recovery Code Cleaner</h2>
 
-    <textarea id="input" placeholder='Paste your Supercell recovery codes here...'></textarea>
+  <textarea id="input" placeholder="Paste your recovery codes here..."></textarea>
+  <br>
+  <button onclick="cleanCodes()">Clean Codes</button>
+  <button onclick="copyOutput()">Copy Output</button>
 
-    <div class="buttons">
-      <button onclick="cleanCodes()">Clean Codes</button>
-      <button onclick="copyOutput()">Copy Output</button>
-    </div>
-
-    <h3>Output:</h3>
-    <div id="output"></div>
-  </div>
+  <h3>Output:</h3>
+  <pre id="output"></pre>
 
   <script>
     function cleanCodes() {
       const input = document.getElementById("input").value.trim();
 
-      // Split text into groups (handles quotes, newlines, commas, etc.)
+      if (!input) {
+        document.getElementById("output").textContent = "Please paste some codes first!";
+        return;
+      }
+
+      // Split input into separate groups
       const groups = input
-        .split(/"(?:\s*|\n*)Supercell ID Recovery Codes:|\n\s*\n/gi)
+        .split(/Supercell ID Recovery Codes:|(?=\n\n)|(?=\r\n\r\n)/gi)
         .map(g => g.trim())
         .filter(g => g.length > 0);
 
       const result = groups.map(group => {
-        // Remove any mention of "Supercell ID Recovery Codes" and quotes
+        // Remove any unwanted text or quotes
         let cleanedGroup = group
           .replace(/Supercell\s*ID\s*Recovery\s*Codes:?/gi, '')
           .replace(/"/g, '')
           .trim();
 
-        // Split by comma or newline
+        // Split by commas, newlines, or multiple spaces
         const codes = cleanedGroup
-          .split(/,|\n/)
+          .split(/,|\n|\r|\s{2,}/)
           .map(c => c.trim())
           .filter(c => c.length > 0);
 
-        // Remove all spaces within each code
+        // Remove all spaces inside each code
         const cleaned = codes.map(c => c.replace(/\s+/g, ''));
 
-        // Output format with small space after commas
-        return `['${cleaned.join("', ' ")}']`;
+        // ✅ Join without any spaces after commas
+        return `['${cleaned.join("','")}']`;
       });
 
       document.getElementById("output").textContent = result.join("\n\n");
